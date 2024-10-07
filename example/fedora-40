@@ -1,0 +1,4 @@
+Linux: fedora 40
+sudo: installed
+sudoers-ALL: root %wheel
+root-passwd: locked

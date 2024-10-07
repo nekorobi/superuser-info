@@ -1,0 +1,4 @@
+Linux: ubuntu 24.04
+sudo: installed
+sudoers-ALL: root %admin %sudo
+root-passwd: locked

@@ -1,0 +1,4 @@
+Linux: debian 12
+sudo: installed
+sudoers-ALL: root %sudo
+root-passwd: locked

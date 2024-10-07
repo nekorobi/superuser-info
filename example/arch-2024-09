@@ -1,0 +1,4 @@
+Linux: arch
+sudo: installed
+sudoers-ALL: root
+root-passwd: locked
