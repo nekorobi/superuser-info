@@ -2,11 +2,22 @@
 # superuser-info.sh
 # MIT License © 2024 Nekorobi
 version=1.0.0
-LANG=C  script=$(readlink -e "$BASH_SOURCE")
+script=$(readlink -e "$BASH_SOURCE")
+unset debug args reALL
+args=("$@")
 # sudoers: ALL=ALL, ALL=(ALL)ALL, ALL=(ALL:ALL)ALL
 reALL='^\s*%?\S+\s+ALL\s*=\s*(\(\s*ALL(\s*:\s*ALL)?\s*\))?\s*ALL(\s*|\s+#.*)$'
 
-if [[ $1 =~ ^(-V|--version)$ ]]; then echo superuser-info.sh v$version; exit; fi
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+  --debug)        debug=on; shift 1;;
+  -V|--version)   echo resolver-info.sh $version; exit 0;;
+  # invalid
+  -*) error "$1: unknown option";;
+  # Operand
+  *) error "$1: unknown argument";;
+  esac
+done
 
 sudoExists() { type sudo >/dev/null 2>&1; }
 canSudo() {
@@ -18,17 +29,19 @@ canSudo() {
   [[ $? = 0 || ($? = 1 && $result =~ 'password is required') ]] || return 2
   sudo --list -u root "$@" >/dev/null 2>&1 || return 3
 }
-adminRun() { # --debug
+rootRun() {
   if [[ $(id -u) = 0 ]]; then
     "$@"
   elif canSudo "$@"; then
+    [[ $debug ]] && echo sudo --login -u root "$@" 1>&2
     sudo --login -u root "$@"
   else
+    [[ $debug ]] && echo su --login -c '"$@"' root -- arg0 "$@" 1>&2
     su --login -c '"$@"' root -- arg0 "$@" # arg0 is treated as filename
   fi
 }
 # Rerun this script as a superuser
-if [[ $(id -u) != 0 ]]; then adminRun "$script" "$@"; exit $?; fi
+if [[ $(id -u) != 0 && ! $debug ]]; then rootRun "$script" "$@"; exit $?; fi
 
 infoLinux() {
   echo Linux: $(sed '/^ID=/ ! d; s/^ID=//; s/"//g' /etc/os-release) \
@@ -37,14 +50,14 @@ infoLinux() {
 infoSudo() {
   if sudoExists; then
     echo sudo: installed
-    echo sudoers-ALL: $(grep -E "$reALL" /etc/sudoers | awk '{print $1}')
+    echo sudoers-ALL: $(rootRun grep -E "$reALL" /etc/sudoers | awk '{print $1}')
   else
     echo sudo: not installed
   fi
 }
 infoRoot() {
   echo -n 'root-passwd: '
-  local p=$(passwd --status root | awk '{print $2}') # L|NP|P
+  local p=$(rootRun passwd --status root | awk '{print $2}') # L|NP|P
   if [[ $p = P ]]; then echo set; elif [[ $p = L ]]; then echo locked; else echo unset; fi
 }
 
