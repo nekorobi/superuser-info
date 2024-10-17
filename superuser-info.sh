@@ -11,7 +11,7 @@ reALL='^\s*%?\S+\s+ALL\s*=\s*(\(\s*ALL(\s*:\s*ALL)?\s*\))?\s*ALL(\s*|\s+#.*)$'
 while [[ $# -gt 0 ]]; do
   case "$1" in
   --debug)        debug=on; shift 1;;
-  -V|--version)   echo resolver-info.sh $version; exit 0;;
+  -V|--version)   echo superuser-info.sh $version; exit 0;;
   # invalid
   -*) error "$1: unknown option";;
   # Operand
