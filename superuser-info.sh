@@ -1,7 +1,7 @@
 #!/bin/bash
 # superuser-info.sh
 # MIT License © 2024 Nekorobi
-version=v1.0.1
+version=v1.0.2
 script=$(readlink -e "$BASH_SOURCE")
 unset debug args reALL
 args=("$@")
