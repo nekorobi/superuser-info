@@ -8,14 +8,16 @@ args=("$@")
 # sudoers: ALL=ALL, ALL=(ALL)ALL, ALL=(ALL:ALL)ALL
 reALL='^\s*%?\S+\s+ALL\s*=\s*(\(\s*ALL(\s*:\s*ALL)?\s*\))?\s*ALL(\s*|\s+#.*)$'
 
+error() { local s=$1; shift 1; echo -e "Error: $@" 1>&2; exit $s; }
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
   --debug)        debug=on; shift 1;;
   -V|--version)   echo superuser-info.sh $version; exit 0;;
   # invalid
-  -*) error "$1: unknown option";;
+  -*) error 1 $1: unknown option;;
   # Operand
-  *) error "$1: unknown argument";;
+  *) error 1 $1: unknown argument;;
   esac
 done
 
